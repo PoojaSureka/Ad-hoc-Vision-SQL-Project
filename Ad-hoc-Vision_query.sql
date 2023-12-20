@@ -30,7 +30,7 @@ WHERE fiscal_year = 2021)
 
 SELECT 
 	product_2020, 
-    product_2021,
+    	product_2021,
 	ROUND((product_2021-product_2020)*100/product_2020,2) AS PERCENT_CHANGE 
 FROM unique_products_2020
 CROSS JOIN unique_products_2021;
@@ -45,7 +45,7 @@ Solution:
 
 SELECT 
 	segment, 
-    COUNT(product) AS product_count
+    	COUNT(product) AS product_count
 FROM dim_product
 GROUP BY segment 
 ORDER BY product_count desc;
@@ -62,7 +62,7 @@ Solution:
 WITH product_count_2020 AS
 (SELECT 
 	p.segment,
-    COUNT(DISTINCT p.product_code) AS product_count_20 
+    	COUNT(DISTINCT p.product_code) AS product_count_20 
 FROM dim_product p 
 JOIN fact_sales_monthly s 
 ON  p.product_code = s.product_code 
@@ -72,7 +72,7 @@ GROUP BY p.segment),
 product_count_2021 AS
 (SELECT 
 	p.segment, 
-    COUNT(DISTINCT p.product_code) AS product_count_21 
+    	COUNT(DISTINCT p.product_code) AS product_count_21 
 FROM dim_product p
 JOIN fact_sales_monthly s 
 ON  p.product_code = s.product_code 
@@ -81,9 +81,9 @@ GROUP BY p.segment)
 
 SELECT 
 	p20.segment, 
-    p20.product_count_20,
-    p21.product_count_21, 
-    (p21.product_count_21-p20.product_count_20) AS Difference 
+   	 p20.product_count_20,
+   	 p21.product_count_21, 
+    	(p21.product_count_21-p20.product_count_20) AS Difference 
 FROM   product_count_2020 p20 
 JOIN  product_count_2021 p21 
 ON p20.segment = p21.segment;
@@ -99,8 +99,8 @@ Solution:
 
 (SELECT 
 	p.product, 
-    p.product_code,
-    MAX(m.manufacturing_cost) AS manufacturing_cost  
+   	 p.product_code,
+    	MAX(m.manufacturing_cost) AS manufacturing_cost  
 FROM dim_product p 
 JOIN fact_manufacturing_cost m
 ON p.product_code = m.product_code      
@@ -113,7 +113,7 @@ UNION
 (SELECT 
 	p.product, 
 	p.product_code,
-    MIN(m.manufacturing_cost) AS manufacturing_cost  
+    	MIN(m.manufacturing_cost) AS manufacturing_cost  
 FROM dim_product p 
 JOIN fact_manufacturing_cost m
 ON p.product_code = m.product_code      
@@ -134,7 +134,7 @@ Solution:
 
 SELECT
 	c.customer_code,
-    c.customer, 
+    	c.customer, 
 	ROUND(AVG(i.pre_invoice_discount_pct),4) AS average_discount_percentage
 FROM dim_customer c JOIN fact_pre_invoice_deductions i
 ON c.customer_code = i.customer_code
@@ -156,8 +156,8 @@ Solution:
 
 select 
 	MONTHNAME(s.date) AS Month, 
-    s.fiscal_year, 
-    Round(SUM(s.sold_quantity *p.gross_price),2) AS Gross_sales_Amount
+    	s.fiscal_year, 
+    	Round(SUM(s.sold_quantity *p.gross_price),2) AS Gross_sales_Amount
 FROM fact_sales_monthly s 
 Join fact_gross_price p ON s.product_code = p.product_code
 JOIN dim_customer c ON  c. customer_code = s.customer_code
@@ -211,7 +211,7 @@ Solution:
 
 WITH cte AS (
 	SELECT c.channel, 
-    ROUND(SUM(s.sold_quantity*p.gross_price),2) AS gross_sales_mln 
+    	ROUND(SUM(s.sold_quantity*p.gross_price),2) AS gross_sales_mln 
 FROM fact_sales_monthly s 
 JOIN fact_gross_price p 
 ON p.product_code = s.product_code
@@ -222,8 +222,8 @@ GROUP BY c.channel)
 
 SELECT
 	channel, 
-    gross_sales_mln ,  
-    ROUND(gross_sales_mln *100 /SUM(gross_sales_mln) OVER(),2) AS percentage 
+    	gross_sales_mln ,  
+    	ROUND(gross_sales_mln *100 /SUM(gross_sales_mln) OVER(),2) AS percentage 
 FROM cte 
 order by percentage DESC;
 
@@ -244,8 +244,8 @@ WITH cte1 AS (
 SELECT 
 	p.division, 
 	p.product_code, 
-    p.product, 
-    UM(s.sold_quantity) AS total_sold_quantity
+    	p.product, 
+    	SUM(s.sold_quantity) AS total_sold_quantity
 FROM dim_product p 
 JOIN fact_sales_monthly s 
 ON p.product_code = s.product_code
@@ -255,10 +255,10 @@ GROUP BY  p.division, p.product_code, p.product),
 cte2 AS (
 SELECT 
 	division, 
-    product_code, 
-    product, 
-    total_sold_quantity, 
-    DENSE_RANK() OVER(PARTITION BY division ORDER BY total_sold_quantity DESC) AS rn 
+    	product_code, 
+    	product, 
+    	total_sold_quantity, 
+    	DENSE_RANK() OVER(PARTITION BY division ORDER BY total_sold_quantity DESC) AS rn 
 FROM cte1)
 
 SELECT * FROM cte2 WHERE rn IN (1,2,3);
