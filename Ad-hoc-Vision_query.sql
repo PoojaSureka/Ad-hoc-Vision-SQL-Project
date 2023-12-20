@@ -80,7 +80,7 @@ WHERE fiscal_year= 2021
 GROUP BY p.segment)
 
 SELECT 
-	p20.segment, 
+	 p20.segment, 
    	 p20.product_count_20,
    	 p21.product_count_21, 
     	(p21.product_count_21-p20.product_count_20) AS Difference 
@@ -98,7 +98,7 @@ manufacturing_cost
 Solution: 
 
 (SELECT 
-	p.product, 
+	 p.product, 
    	 p.product_code,
     	MAX(m.manufacturing_cost) AS manufacturing_cost  
 FROM dim_product p 
